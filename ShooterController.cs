@@ -50,6 +50,7 @@ public class ShooterController : MonoBehaviour {
 				m_ballObject.GetComponent<Rigidbody2D> ().velocity = m_shootV3 * m_speed;
 				m_ballObject.GetComponent<Collider2D> ().isTrigger = false;
 
+				m_ballObject.AddComponent<BallStop> (); //添加球停止的属性
 
 			}
 		}
