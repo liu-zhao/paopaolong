@@ -73,10 +73,15 @@ public class BallStop : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.gameObject.tag == Config.staticBall & !m_trigger) {
+			//保证只执行一次
 			m_trigger = true;
+			//底墙参与碰撞
 			m_wallBottom.GetComponent<Collider2D> ().isTrigger = false;
+			//删除当前物体的停止脚本
 			Destroy(GetComponent<BallStop>());
+			//变成触发
 			GetComponent<Collider2D> ().isTrigger = true;
+			//设置为静态球
 			tag = Config.staticBall;
 			m_xy = nearPoint (transform.position);//寻找最近停靠点 m_xy里面存放了距离最近的点的值
 			transform.position = CreateBall.Instance.m_ball[m_xy.x,m_xy.y].pointobject.transform.position;//停在最近点上
@@ -115,7 +120,44 @@ public class BallStop : MonoBehaviour {
 			
 				for (int i = 0; i < m_listB.Count; i++) {
 					xy t_xy = (xy)m_listB [i];
-					drop (t_xy);//消除
+					//球的爆裂死亡方式，参考BallProperty
+					CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject.GetComponent<BallProperty> ().m_state = 3;
+					CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject = null;
+					//drop (t_xy);//消除
+				}
+			}
+
+			/*
+			 * 处理空球掉落
+			*/
+			m_listA.Clear();
+			m_listB.Clear();
+			m_stackA.Clear();
+			//有掉落时从有掉落的地方开始寻找
+			for (int j = 0; j < m_y; j++) {
+				for (int i = 0; i < m_x; i++) {
+					if (CreateBall.Instance.m_ball [i, j].ballobject != null) {
+						xy t_xy;
+						t_xy.x = i;
+						t_xy.y = j;
+						m_listA.Add (t_xy);// 只要不为空就把球加到列表中
+					}
+
+				}
+			}
+			//从中心点开始计算相切
+			m_xy.x = CreateBall.Instance.m_centerx;
+			m_xy.y = CreateBall.Instance.m_centery;
+			all_tangency (m_xy);
+			//大于0表示有空接的球
+			if (m_listA.Count > 0) {
+				for (int i = 0; i < m_listA.Count; i++) {
+					if (m_listA [i] != null) {
+						xy t_xy = (xy)m_listA [i];
+						//球的爆裂死亡方式，参考BallProperty
+						CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject.GetComponent<BallProperty> ().m_state = 3;
+						CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject = null;
+					}
 				}
 			}
 
@@ -170,8 +212,8 @@ public class BallStop : MonoBehaviour {
 			m_listB.Add (judgxy);
 		}
 	}
-	//消除功能
-	void drop (xy t_xy)
+	//普通消除功能
+	/*void drop (xy t_xy)
 	{
 		GameObject m_b = CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject;
 		m_b.GetComponent<Rigidbody2D> ().isKinematic = false;
@@ -179,7 +221,7 @@ public class BallStop : MonoBehaviour {
 		m_b.GetComponent<Collider2D> ().isTrigger = false;
 		m_b.tag = Config.loseBall;
 		Destroy (m_b, 2);
-		m_b = null;
+		m_b = null;//置空可以防止空接掉落计算到该球
 
-	}
+	}*/
 }
