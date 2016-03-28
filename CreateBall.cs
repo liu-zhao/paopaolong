@@ -28,7 +28,7 @@ public class CreateBall : MonoBehaviour {
 		Instance = this;
 
 		m_ball = new ball[m_x, m_y];
-		initLayer (7);
+		initLayer (3);
 
 		Vector3 shootPos = GameObject.FindGameObjectWithTag ("Player").transform.position;
 		m_ballObject = m_ballStyle [Random.Range (0, m_layerMaxBallNum)];
@@ -118,8 +118,8 @@ public class CreateBall : MonoBehaviour {
 
 		//设置中心球
 		m_ball[m_centerx,m_centery].ballobject.SetActive(true);
-
-		for (int k = 0; k < m_layerMaxBallNum; k++) {
+		//随机产生花色  根据质量
+		for (int k = 1; k <= m_layerMaxBallNum; k++) {
 			for (int j = 0; j < m_y; j++) {
 				for (int i = 0; i < m_x; i++) {
 					if (m_ball [i, j].ballobject != null) {

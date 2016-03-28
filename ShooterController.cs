@@ -6,7 +6,7 @@ public class ShooterController : MonoBehaviour {
 	public float m_speed = 2f;//移动速度
 	public bool m_shooter = false;//是否可以开跑
 	public GameObject m_explosion;//爆炸效果
-
+	private GameObject m_wallBottom;//找到底墙
 
 	private Transform m_transform;//炮身
 	private Transform m_childform;//炮管
@@ -23,6 +23,7 @@ public class ShooterController : MonoBehaviour {
 		m_childform = m_transform.FindChild ("shooter");
 		m_ppoint = m_childform.FindChild ("Point_p");
 		m_transformpos = m_transform.position;
+		m_wallBottom = GameObject.FindGameObjectWithTag (Config.wallBottom);
 	}
 	
 	// Update is called once per frame
@@ -38,6 +39,8 @@ public class ShooterController : MonoBehaviour {
 
 			if((Input.GetMouseButtonDown(0)||Input.GetKeyDown(KeyCode.Space))&&m_shooter)
 			{
+
+				m_wallBottom.GetComponent<Collider2D> ().isTrigger = true;//让底墙不参与碰撞 在ballstop里设置碰撞
 				//发射球
 				GameObject m_ballObject = CreateBall.Instance.m_shootBall[0];//得到球 从CreateBall这个类
 
