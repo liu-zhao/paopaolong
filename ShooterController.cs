@@ -54,7 +54,7 @@ public class ShooterController : MonoBehaviour {
 				m_ballObject.GetComponent<Collider2D> ().isTrigger = false;
 
 				m_ballObject.AddComponent<BallStop> (); //添加球停止的属性
-
+				m_shooter = false;//防止多次发射
 			}
 		}
 	}

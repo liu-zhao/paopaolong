@@ -11,7 +11,7 @@ public class Config : MonoBehaviour {
 	public const string wallBottom = "WallBottom";
 	public const string loseBall = "LoseBall";
 	public const string staticBall = "StaticBall";
-
+	public const string ballShine = "BallShine";
 
 	/***screen resolution***/
 	public const float m_screenWidth = 480;

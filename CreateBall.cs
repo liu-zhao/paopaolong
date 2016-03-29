@@ -28,7 +28,7 @@ public class CreateBall : MonoBehaviour {
 		Instance = this;
 
 		m_ball = new ball[m_x, m_y];
-		initLayer (3);
+		initLayer (5);
 
 		Vector3 shootPos = GameObject.FindGameObjectWithTag ("Player").transform.position;
 		m_ballObject = m_ballStyle [Random.Range (0, m_layerMaxBallNum)];
@@ -132,7 +132,7 @@ public class CreateBall : MonoBehaviour {
 			}
 		}
 		//增加一个力
-		m_ball [m_centerx, m_centery].ballobject.GetComponent<Rigidbody2D> ().AddTorque (m_layer * 300f);
+		m_ball [m_centerx, m_centery].ballobject.GetComponent<Rigidbody2D> ().AddTorque (m_layer * 100f);
 	}
 
 }
