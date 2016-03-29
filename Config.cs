@@ -13,6 +13,9 @@ public class Config : MonoBehaviour {
 	public const string staticBall = "StaticBall";
 
 
+	/***screen resolution***/
+	public const float m_screenWidth = 480;
+	public const float m_screenHeight = 800;
 	// Use this for initialization
 	void Start () {
 		Instance = this;
