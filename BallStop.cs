@@ -26,13 +26,31 @@ public class BallStop : MonoBehaviour {
 	private ArrayList m_listB = new ArrayList();//放入要消除的泡泡
 	private Stack m_stackA = new Stack ();//过渡栈
 
+	/*****
+	 * 旋转
+	 * 
+	*****/
+	private Vector3 m_lastvect3;//记录上一次碰撞墙壁的位置
+	private Transform m_centerballfrom; 
+
+	/***
+	 * 计分
+	**/
+	public int m_scoretotaly;//一次打球得分总和
+	private GameObject m_addScoreNumberF;//加号符
+
 	// Use this for initialization
 	void Start () {
 		m_transform = this.transform;
 		m_shootPos = GameObject.FindGameObjectWithTag ("Player").transform;
 		m_wallBottom = GameObject.FindGameObjectWithTag (Config.wallBottom);
+
+		m_centerballfrom = CreateBall.Instance.m_ball [CreateBall.Instance.m_centerx, CreateBall.Instance.m_centery].ballobject.transform;
+
 	}
-	
+
+
+
 	// Update is called once per frame
 	void Update () {
 	
@@ -46,6 +64,10 @@ public class BallStop : MonoBehaviour {
 		{
 			m_hitWall++;
 			m_wallBottom.GetComponent<Collider2D> ().isTrigger = false;//可以碰撞
+
+			//记录上一次碰撞点，以做旋转
+			m_lastvect3 = other.gameObject.transform.position;
+
 			if (m_hitWall == 6) 
 			{
 				GetComponent<Collider2D> ().isTrigger = true;
@@ -93,6 +115,19 @@ public class BallStop : MonoBehaviour {
 			*/
 			createShootBall ();//创建要发射的球
 
+			/***
+			 * 实现碰撞旋转
+			 * 
+			***/
+			//求得旋转角度
+			Vector3 wallToCenter = m_centerballfrom.position - m_lastvect3;
+			Vector3 wallToThis = m_transform.position - m_lastvect3;
+			Quaternion targertrotate = Quaternion.FromToRotation (wallToCenter, wallToThis);
+			//矩阵旋转
+			m_centerballfrom.GetComponent<Rigidbody2D>().AddTorque(-targertrotate.z *300);
+
+
+
 			/*
 			 * 要实现同颜色相消
 			*/
@@ -120,12 +155,13 @@ public class BallStop : MonoBehaviour {
 			
 				for (int i = 0; i < m_listB.Count; i++) {
 					xy t_xy = (xy)m_listB [i];
+					m_scoretotaly += 1; //掉一个球1分 同空球掉落
 					//球的爆裂死亡方式，参考BallProperty
 					CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject.GetComponent<BallProperty> ().m_state = 3;
 					CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject = null;
 					//drop (t_xy);//消除
 				}
-			}
+			
 
 			/*
 			 * 处理空球掉落
@@ -154,13 +190,26 @@ public class BallStop : MonoBehaviour {
 				for (int i = 0; i < m_listA.Count; i++) {
 					if (m_listA [i] != null) {
 						xy t_xy = (xy)m_listA [i];
+						m_scoretotaly += 1; //掉一个球1分
 						//球的爆裂死亡方式，参考BallProperty
 						CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject.GetComponent<BallProperty> ().m_state = 3;
 						CreateBall.Instance.m_ball [t_xy.x, t_xy.y].ballobject = null;
 					}
 				}
 			}
+			/* 
+			 * 
+			 * 实现计分功能
+			*/
+			GameGUI.Instance.addScore (m_scoretotaly);
+			m_addScoreNumberF = Instantiate (GameGUI.Instance.m_addScoreNumberF, m_transform.position, Quaternion.identity)as GameObject;
+			m_addScoreNumberF.GetComponent<NumberProperty> ().m_state = 1;
+			Destroy (m_addScoreNumberF, 2);
+			drawAddScoreNumber (m_transform.position, m_scoretotaly, GameGUI.Instance.m_addScoreNumber2);
+			//Debug.Log (m_scoretotaly);
 
+
+			}
 		}
 	}
 	/*
@@ -224,4 +273,20 @@ public class BallStop : MonoBehaviour {
 		m_b = null;//置空可以防止空接掉落计算到该球
 
 	}*/
+
+	/*************显示加分**************/
+	void drawAddScoreNumber(Vector3 position,int point,GameObject[] numbers)
+	{
+		char[] chars = point.ToString ().ToCharArray ();//将得分从整数转化为字符;
+
+		position = new Vector3 (position.x + 0.3f, position.y, 0);//调整显示位置
+
+		foreach (char s in chars) {
+			int i = int.Parse (s.ToString());
+			GameObject tempObject = Instantiate (numbers [i], position, Quaternion.identity) as GameObject;
+			tempObject.GetComponent<NumberProperty> ().m_state = 1;
+			Destroy (tempObject, 2);
+			position = new Vector3(position.x+0.3f,position.y,0);
+		}
+	}
 }

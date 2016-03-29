@@ -131,6 +131,7 @@ public class CreateBall : MonoBehaviour {
 				}
 			}
 		}
+		//增加一个力
 		m_ball [m_centerx, m_centery].ballobject.GetComponent<Rigidbody2D> ().AddTorque (m_layer * 300f);
 	}
 
